@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { CATEGORIES, CURRICULUM, SIGNALS, type Category } from "@/data/signals";
+import { CATEGORIES, CURRICULUM, SIGNALS, TONIGHT_ROUTE, type Category } from "@/data/signals";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -94,8 +94,30 @@ function Index() {
         })}
       </nav>
 
+      {/* Tonight's route */}
+      <section aria-label="Tonight's route" className="mb-20">
+        <p className="eyebrow">If you only do one thing tonight</p>
+        <h2 className="mt-3 text-3xl sm:text-4xl">The route</h2>
+        <ol className="mt-8 border border-border">
+          {TONIGHT_ROUTE.map((stop) => (
+            <li
+              key={stop.time}
+              className="surface grid gap-2 border-b border-border p-5 last:border-b-0 sm:grid-cols-[7rem_1fr]"
+            >
+              <p className="font-display text-2xl text-primary">{stop.time}</p>
+              <div>
+                <p className="text-lg">{stop.place}</p>
+                <p className="text-sm text-muted-foreground">{stop.address}</p>
+                <p className="mt-1 text-sm">{stop.note}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </section>
+
       {/* Feed */}
       <section aria-label="Daily feed">
+
         <div className="flex items-baseline justify-between">
           <h2 className="text-3xl sm:text-4xl">Tonight&rsquo;s movement</h2>
           <span className="eyebrow">{signals.length} signals</span>
@@ -114,7 +136,29 @@ function Index() {
               <div>
                 <p className="eyebrow">{s.category}</p>
                 <h3 className="mt-2 text-2xl leading-snug">{s.title}</h3>
-                <p className="mt-1 text-sm text-muted-foreground">{s.venue}</p>
+                <p className="mt-1 text-sm text-foreground">{s.venue}</p>
+                <p className="mt-1 text-sm text-muted-foreground">{s.address}</p>
+
+                <div className="mt-4 grid gap-px border border-border sm:grid-cols-2">
+                  <div className="surface px-4 py-3">
+                    <p className="eyebrow">Be there</p>
+                    <p className="mt-1 text-sm text-primary">{s.window}</p>
+                  </div>
+                  <div className="surface px-4 py-3">
+                    <p className="eyebrow">Leave</p>
+                    <p className="mt-1 text-sm">{s.exitBy}</p>
+                  </div>
+                  <div className="surface px-4 py-3">
+                    <p className="eyebrow">Where to stand</p>
+                    <p className="mt-1 text-sm">{s.position}</p>
+                  </div>
+                  <div className="surface px-4 py-3">
+                    <p className="eyebrow">Getting in &amp; what it costs</p>
+                    <p className="mt-1 text-sm">
+                      {s.arrival} · {s.spend}
+                    </p>
+                  </div>
+                </div>
 
                 <div className="mt-5 grid gap-5 sm:grid-cols-2">
                   <div className="surface p-4">
