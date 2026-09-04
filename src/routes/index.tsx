@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { CATEGORIES, CURRICULUM, SIGNALS, type Category } from "@/data/signals";
+import { CATEGORIES, CURRICULUM, SIGNALS, TONIGHT_ROUTE, type Category } from "@/data/signals";
 
 export const Route = createFileRoute("/")({
   head: () => ({
