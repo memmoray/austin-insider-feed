@@ -185,8 +185,6 @@ function Index() {
                   </li>
                 </ul>
               </div>
-
-              </div>
             </article>
           ))}
         </div>
