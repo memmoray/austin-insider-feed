@@ -94,8 +94,30 @@ function Index() {
         })}
       </nav>
 
+      {/* Tonight's route */}
+      <section aria-label="Tonight's route" className="mb-20">
+        <p className="eyebrow">If you only do one thing tonight</p>
+        <h2 className="mt-3 text-3xl sm:text-4xl">The route</h2>
+        <ol className="mt-8 border border-border">
+          {TONIGHT_ROUTE.map((stop) => (
+            <li
+              key={stop.time}
+              className="surface grid gap-2 border-b border-border p-5 last:border-b-0 sm:grid-cols-[7rem_1fr]"
+            >
+              <p className="font-display text-2xl text-primary">{stop.time}</p>
+              <div>
+                <p className="text-lg">{stop.place}</p>
+                <p className="text-sm text-muted-foreground">{stop.address}</p>
+                <p className="mt-1 text-sm">{stop.note}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </section>
+
       {/* Feed */}
       <section aria-label="Daily feed">
+
         <div className="flex items-baseline justify-between">
           <h2 className="text-3xl sm:text-4xl">Tonight&rsquo;s movement</h2>
           <span className="eyebrow">{signals.length} signals</span>
