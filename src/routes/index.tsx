@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { CATEGORIES, CURRICULUM, SIGNALS, TONIGHT_ROUTE, type Category } from "@/data/signals";
-import { addDays, fmtDay, fmtShort, weekNumber, weekStart } from "@/lib/week";
+import { addDays, austinNow, fmtDay, fmtShort, toMinutes, weekNumber, weekStart } from "@/lib/week";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -38,15 +38,25 @@ const NIGHTS = [3, 4, 5, 6];
 function Index() {
   const [active, setActive] = useState<Category | "All">("All");
   const monday = useMemo(() => weekStart(), []);
+  const { today, minutes } = useMemo(() => austinNow(), []);
   const wk = weekNumber(monday);
 
+  // Only today (not yet started) or later; past nights roll to next week.
   const dated = useMemo(
     () =>
-      SIGNALS.map((s, i) => ({ ...s, date: addDays(monday, NIGHTS[(i + wk) % NIGHTS.length]!) }))
-        .sort((a, b) => a.date.getTime() - b.date.getTime()),
-    [monday, wk],
+      SIGNALS.map((s, i) => {
+        const day = NIGHTS[(i + wk) % NIGHTS.length]!;
+        let date = addDays(monday, day);
+        const passed =
+          date.getTime() < today.getTime() ||
+          (date.getTime() === today.getTime() && toMinutes(s.time) <= minutes);
+        if (passed) date = addDays(monday, day + 7);
+        return { ...s, date };
+      }).sort((a, b) => a.date.getTime() - b.date.getTime() || toMinutes(a.time) - toMinutes(b.time)),
+    [monday, wk, today, minutes],
   );
-  const routeDate = addDays(monday, 4);
+  const todayDow = (today.getUTCDay() + 6) % 7;
+  const routeDate = addDays(today, (4 - todayDow + 7) % 7 || (todayDow === 4 && minutes > toMinutes("6:12 PM") ? 7 : 0));
 
   const signals = useMemo(
     () => (active === "All" ? dated : dated.filter((s) => s.category === active)),
