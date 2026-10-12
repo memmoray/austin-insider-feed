@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { CATEGORIES, CURRICULUM, SIGNALS, TONIGHT_ROUTE, type Category } from "@/data/signals";
-import { addDays, fmtDay, fmtShort, weekNumber, weekStart } from "@/lib/week";
+import { addDays, austinNow, fmtDay, fmtShort, toMinutes, weekNumber, weekStart } from "@/lib/week";
 
 export const Route = createFileRoute("/")({
   head: () => ({
