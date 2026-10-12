@@ -113,7 +113,7 @@ function Index() {
 
       {/* Tonight's route */}
       <section aria-label="Tonight's route" className="mb-20">
-        <p className="eyebrow">If you only do one thing tonight</p>
+        <p className="eyebrow">If you only do one night this week · {fmtDay(routeDate)}</p>
         <h2 className="mt-3 text-3xl sm:text-4xl">The route</h2>
         <ol className="mt-8 border border-border">
           {TONIGHT_ROUTE.map((stop) => (
@@ -136,7 +136,7 @@ function Index() {
       <section aria-label="Daily feed">
 
         <div className="flex items-baseline justify-between">
-          <h2 className="text-3xl sm:text-4xl">Tonight&rsquo;s movement</h2>
+          <h2 className="text-3xl sm:text-4xl">This week&rsquo;s movement</h2>
           <span className="eyebrow">{signals.length} signals</span>
         </div>
         <div className="mt-6 flex flex-col">
@@ -146,6 +146,7 @@ function Index() {
               className="group grid gap-5 border-t border-border py-8 sm:grid-cols-[7rem_1fr]"
             >
               <div>
+                <p className="eyebrow text-primary">{fmtDay(s.date)}</p>
                 <p className="font-display text-2xl text-primary">{s.time}</p>
                 <p className="eyebrow mt-1">{s.district}</p>
               </div>
@@ -207,7 +208,7 @@ function Index() {
         </div>
         {signals.length === 0 && (
           <p className="border-t border-border py-12 text-sm text-muted-foreground">
-            Nothing surfaced in this category tonight. Quiet rooms are still rooms.
+            Nothing surfaced in this category this week. Quiet rooms are still rooms.
           </p>
         )}
       </section>
