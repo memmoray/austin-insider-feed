@@ -27,3 +27,21 @@ export const fmtDay = (d: Date) =>
 
 export const fmtShort = (d: Date) =>
   d.toLocaleDateString("en-US", { timeZone: "UTC", month: "short", day: "numeric" });
+
+/** Today's date (Austin) as UTC-noon Date, plus minutes since midnight. */
+export function austinNow(now = new Date()) {
+  const p = new Intl.DateTimeFormat("en-US", {
+    timeZone: TZ, year: "numeric", month: "numeric", day: "numeric",
+    hour: "numeric", minute: "numeric", hourCycle: "h23",
+  }).formatToParts(now);
+  const g = (t: string) => +p.find((x) => x.type === t)!.value;
+  return { today: new Date(Date.UTC(g("year"), g("month") - 1, g("day"), 12)), minutes: g("hour") * 60 + g("minute") };
+}
+
+export function toMinutes(t: string) {
+  const m = t.match(/(\d+):(\d+)\s*(AM|PM)/i);
+  if (!m) return 0;
+  let h = +m[1]! % 12;
+  if (m[3]!.toUpperCase() === "PM") h += 12;
+  return h * 60 + +m[2]!;
+}
