@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { CATEGORIES, CURRICULUM, SIGNALS, TONIGHT_ROUTE, type Category } from "@/data/signals";
+import { addDays, fmtDay, fmtShort, weekNumber, weekStart } from "@/lib/week";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -31,12 +32,25 @@ const ACCESS_TONE: Record<string, string> = {
   "List only": "text-muted-foreground",
 };
 
+// Thu–Sun are the nights rooms form; signals rotate across them weekly.
+const NIGHTS = [3, 4, 5, 6];
+
 function Index() {
   const [active, setActive] = useState<Category | "All">("All");
+  const monday = useMemo(() => weekStart(), []);
+  const wk = weekNumber(monday);
+
+  const dated = useMemo(
+    () =>
+      SIGNALS.map((s, i) => ({ ...s, date: addDays(monday, NIGHTS[(i + wk) % NIGHTS.length]!) }))
+        .sort((a, b) => a.date.getTime() - b.date.getTime()),
+    [monday, wk],
+  );
+  const routeDate = addDays(monday, 4);
 
   const signals = useMemo(
-    () => (active === "All" ? SIGNALS : SIGNALS.filter((s) => s.category === active)),
-    [active],
+    () => (active === "All" ? dated : dated.filter((s) => s.category === active)),
+    [active, dated],
   );
 
   const avgConfidence = Math.round(
@@ -47,15 +61,18 @@ function Index() {
     <main className="mx-auto w-full max-w-6xl px-5 pb-24 sm:px-8">
       {/* Masthead */}
       <header className="pt-14 pb-10 sm:pt-20">
-        <p className="eyebrow">Austin, Texas · Friday edition</p>
+        <p className="eyebrow">
+          Austin, Texas · Week of {fmtShort(monday)} – {fmtShort(addDays(monday, 6))},{" "}
+          {addDays(monday, 6).getUTCFullYear()}
+        </p>
         <h1 className="mt-4 text-5xl leading-[0.95] sm:text-7xl">
           The Velvet Ledger
         </h1>
         <div className="hairline mt-7" />
         <p className="mt-7 max-w-2xl text-base leading-relaxed text-muted-foreground">
-          A quiet daily record of where Austin&rsquo;s rooms are forming tonight — assembled
-          entirely from public digital exhaust. Read it long enough and you stop needing it:
-          the habits of access become your own.
+          A quiet weekly record of where Austin&rsquo;s rooms are forming — assembled
+          entirely from public digital exhaust. A new edition every Monday. Read it long
+          enough and you stop needing it: the habits of access become your own.
         </p>
 
         <dl className="mt-10 grid grid-cols-2 gap-px overflow-hidden border border-border sm:grid-cols-4">
@@ -96,7 +113,7 @@ function Index() {
 
       {/* Tonight's route */}
       <section aria-label="Tonight's route" className="mb-20">
-        <p className="eyebrow">If you only do one thing tonight</p>
+        <p className="eyebrow">If you only do one night this week · {fmtDay(routeDate)}</p>
         <h2 className="mt-3 text-3xl sm:text-4xl">The route</h2>
         <ol className="mt-8 border border-border">
           {TONIGHT_ROUTE.map((stop) => (
@@ -119,7 +136,7 @@ function Index() {
       <section aria-label="Daily feed">
 
         <div className="flex items-baseline justify-between">
-          <h2 className="text-3xl sm:text-4xl">Tonight&rsquo;s movement</h2>
+          <h2 className="text-3xl sm:text-4xl">This week&rsquo;s movement</h2>
           <span className="eyebrow">{signals.length} signals</span>
         </div>
         <div className="mt-6 flex flex-col">
@@ -129,6 +146,7 @@ function Index() {
               className="group grid gap-5 border-t border-border py-8 sm:grid-cols-[7rem_1fr]"
             >
               <div>
+                <p className="eyebrow text-primary">{fmtDay(s.date)}</p>
                 <p className="font-display text-2xl text-primary">{s.time}</p>
                 <p className="eyebrow mt-1">{s.district}</p>
               </div>
@@ -190,7 +208,7 @@ function Index() {
         </div>
         {signals.length === 0 && (
           <p className="border-t border-border py-12 text-sm text-muted-foreground">
-            Nothing surfaced in this category tonight. Quiet rooms are still rooms.
+            Nothing surfaced in this category this week. Quiet rooms are still rooms.
           </p>
         )}
       </section>
