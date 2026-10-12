@@ -42,7 +42,7 @@ function Index() {
 
   const dated = useMemo(
     () =>
-      SIGNALS.map((s, i) => ({ ...s, date: addDays(monday, NIGHTS[(i + wk) % NIGHTS.length]) }))
+      SIGNALS.map((s, i) => ({ ...s, date: addDays(monday, NIGHTS[(i + wk) % NIGHTS.length]!) }))
         .sort((a, b) => a.date.getTime() - b.date.getTime()),
     [monday, wk],
   );
