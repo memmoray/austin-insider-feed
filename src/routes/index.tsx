@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { CATEGORIES, CURRICULUM, SIGNALS, TONIGHT_ROUTE, type Category } from "@/data/signals";
+import { addDays, fmtDay, fmtShort, weekNumber, weekStart } from "@/lib/week";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -31,12 +32,25 @@ const ACCESS_TONE: Record<string, string> = {
   "List only": "text-muted-foreground",
 };
 
+// Thu–Sun are the nights rooms form; signals rotate across them weekly.
+const NIGHTS = [3, 4, 5, 6];
+
 function Index() {
   const [active, setActive] = useState<Category | "All">("All");
+  const monday = useMemo(() => weekStart(), []);
+  const wk = weekNumber(monday);
+
+  const dated = useMemo(
+    () =>
+      SIGNALS.map((s, i) => ({ ...s, date: addDays(monday, NIGHTS[(i + wk) % NIGHTS.length]) }))
+        .sort((a, b) => a.date.getTime() - b.date.getTime()),
+    [monday, wk],
+  );
+  const routeDate = addDays(monday, 4);
 
   const signals = useMemo(
-    () => (active === "All" ? SIGNALS : SIGNALS.filter((s) => s.category === active)),
-    [active],
+    () => (active === "All" ? dated : dated.filter((s) => s.category === active)),
+    [active, dated],
   );
 
   const avgConfidence = Math.round(
@@ -47,15 +61,18 @@ function Index() {
     <main className="mx-auto w-full max-w-6xl px-5 pb-24 sm:px-8">
       {/* Masthead */}
       <header className="pt-14 pb-10 sm:pt-20">
-        <p className="eyebrow">Austin, Texas · Friday edition</p>
+        <p className="eyebrow">
+          Austin, Texas · Week of {fmtShort(monday)} – {fmtShort(addDays(monday, 6))},{" "}
+          {addDays(monday, 6).getUTCFullYear()}
+        </p>
         <h1 className="mt-4 text-5xl leading-[0.95] sm:text-7xl">
           The Velvet Ledger
         </h1>
         <div className="hairline mt-7" />
         <p className="mt-7 max-w-2xl text-base leading-relaxed text-muted-foreground">
-          A quiet daily record of where Austin&rsquo;s rooms are forming tonight — assembled
-          entirely from public digital exhaust. Read it long enough and you stop needing it:
-          the habits of access become your own.
+          A quiet weekly record of where Austin&rsquo;s rooms are forming — assembled
+          entirely from public digital exhaust. A new edition every Monday. Read it long
+          enough and you stop needing it: the habits of access become your own.
         </p>
 
         <dl className="mt-10 grid grid-cols-2 gap-px overflow-hidden border border-border sm:grid-cols-4">
